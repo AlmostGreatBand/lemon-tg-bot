@@ -1,0 +1,7 @@
+{
+  "name": "lemon-tg-bot",
+  "version": "1.0.0",
+  "dependencies": {
+    "telegraf": "^3.38.0"
+  }
+}
