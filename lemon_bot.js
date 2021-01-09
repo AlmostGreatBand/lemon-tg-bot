@@ -1,5 +1,4 @@
 'use strict';
-
 const Telegraf = require('telegraf');
 const Markup = require('telegraf/markup')
 const Extra = require('telegraf/extra')
@@ -15,7 +14,7 @@ bot.start((ctx) => ctx.reply('Welcome to Lemon telegram bot'))
 bot.help((ctx) => ctx.reply('This bot is in development right now'))
 
 //Reaction on sending sticker
-bot.on('sticker', (ctx) => ctx.reply('Nice sticer'))
+bot.on('sticker', (ctx) => ctx.reply('Nice sticker'))
 
 //Reply on message Marcus Aurelius
 bot.hears('Marcus Aurelius', (ctx) =>
