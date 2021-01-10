@@ -1,35 +1,59 @@
 'use strict';
+
 const Telegraf = require('telegraf');
 const Markup = require('telegraf/markup');
 const Extra = require('telegraf/extra');
+const request = require('./request.js')
 
 const token = process.env.LEMON_TELEGRAM_TOKEN;
 
 const bot = new Telegraf(token);
 
-const cards = [4242424242424242,4003830171874018,2223007648726984,2222990905257051];
-let currentCardNumber;
+const cardHandlerCreator = (cardData, card) => {
+    bot.action(cardData,(ctx) => {
+        ctx.editMessageText(card);
+    })
+}
 
 const cardButtonsGenerator = (cardsArr) => {
     const result = [];
-    cardsArr.forEach((cardNumber, index) => {
+
+    cardsArr.forEach((card, index) => {
         const cardData = `card${index}`;
-        const cardNumberStr = cardNumber.toString()
-        const cardButtonText = cardNumberStr.substr(0,2) + '...' + cardNumberStr.substr(12,15)
+        const cardButtonText = `***${card.num}`;
         const cardButton = Markup.callbackButton(cardButtonText, cardData)
         result.push(cardButton);
 
-        bot.action(cardData,(ctx) => {
-            ctx.editMessageText(`CardNumber: ${cardNumber}`);
-        })
+        cardHandlerCreator(cardData, card)
     })
     return result;
 }
 
-const cardsButtons = cardButtonsGenerator(cards);
+const credentialsParser = (text) =>{
+    // /login username password some extra text
+    const arr = text.split(' ');
+    return arr[1] + ':' + arr[2];
+}
 
 //Start bot
-bot.start((ctx) => ctx.reply('Welcome to Lemon telegram bot! To start please send \'menu\''))
+bot.start((ctx) => {
+    ctx.reply('Welcome to Lemon telegram bot! \nSend me your data in \'/login username password\' format')
+})
+
+const regex = new RegExp(/^\/login (.+)/);
+
+bot.hears(regex ,(ctx) => {
+    const cards = [];
+    request('cards', credentialsParser(ctx.message.text))
+        .then((data) => {
+            data.forEach((obj) => {
+                cards.push(obj);
+            })
+            ctx.reply('Hello <b> BLA </b>. <i>Please, choose a card</i>',
+                Extra.HTML()
+                    .markup(Markup.inlineKeyboard(cardButtonsGenerator(cards))));
+        })
+});
 
 //Reaction on command /help
 bot.help((ctx) => ctx.reply('This bot is in development right now'))
@@ -40,39 +64,5 @@ bot.on('sticker', (ctx) => ctx.reply('Nice sticker'))
 //Reply on message Marcus Aurelius
 bot.hears('Marcus Aurelius', (ctx) =>
     ctx.reply('You have power over your mind - not outside events. Realize this, and you will find strength.'))
-
-bot.hears('menu', (ctx) =>{
-    ctx.reply('Hello <b>Username</b>. <i>Please, choose a card</i>',
-        Extra.HTML()
-            .markup(Markup.inlineKeyboard(cardsButtons)))
-})
-
-//Reply on message testing
-bot.hears('testing', (ctx) => {
-    ctx.reply('<b>Hi</b>. <i>Choose one option</i>',
-        //Using HTML markup to implement inline buttons
-        Extra.HTML()
-            .markup(Markup.inlineKeyboard([
-                Markup.callbackButton('Rewrite', 'first option'),
-                Markup.callbackButton('Clear', 'second option')
-            ])))
-})
-
-//Activating after pressing the button with data first option
-bot.action('first option', (ctx) => {
-    //Using this method for editing message and not resending it again
-    ctx.editMessageText('<i>Wow, some new text here 😊</i> ' + Math.random(),
-        Extra.HTML()
-            .markup(Markup.inlineKeyboard([
-                Markup.callbackButton('Rewrite', 'first option'),
-                Markup.callbackButton('Clear', 'second option')
-            ]))
-    )
-})
-
-bot.action('second option', (ctx) => {
-    //Using this method to delete current message
-    ctx.deleteMessage();
-})
 
 bot.launch();
