@@ -70,20 +70,21 @@ bot.hears(regex, ctx => {
   );
 });
 
-bot.action('cards', ctx => {
+bot.action('cards', async ctx => {
   const cards = [];
   const creds = credentials.get(ctx.from.id);
-  request('/cards', creds)
-    .then(data => {
-      console.log(data);
-      data.forEach(obj => {
-        cards.push(obj);
-      });
-      ctx.editMessageText(`Hi <b>${creds[0]}</b>. <i>Please, choose a card</i>`,
-        Extra.HTML()
-          .markup(Markup.inlineKeyboard(cardButtonsGenerator(cards))));
-    });
+  const data = await request('/cards', creds);
+  // .then(data => {
+  //   console.log(data);
+  data.forEach(obj => {
+    cards.push(obj);
+  });
+  await ctx.editMessageText(`Hi <b>${creds[0]}</b>. <i>Please, choose a card</i>`,
+    Extra.HTML()
+      .markup(Markup.inlineKeyboard(cardButtonsGenerator(cards))));
+  console.log(data);
 });
+// });
 
 bot.action('transactions', ctx => {
   const creds = credentials.get(ctx.from.id);
