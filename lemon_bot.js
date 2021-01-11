@@ -4,7 +4,10 @@ const Telegraf = require('telegraf');
 const Markup = require('telegraf/markup');
 const Extra = require('telegraf/extra');
 const request = require('./request.js');
+const fs = require('fs');
 const token = process.env.LEMON_TELEGRAM_TOKEN;
+
+const messages = JSON.parse(fs.readFileSync('./messages.json', 'utf-8'));
 
 const bot = new Telegraf(token);
 
@@ -45,7 +48,7 @@ const credentialsParser = text => {
 
 //Start bot
 bot.start(ctx => {
-  ctx.reply('Welcome to Lemon telegram bot! \nSend me your data in \'/login username password\' format');
+  ctx.reply(messages.start);
 });
 
 const regex = new RegExp(/^\/login (.+)/);
@@ -88,10 +91,10 @@ bot.action('transactions', ctx => {
 bot.help(ctx => ctx.reply('This bot is in development right now'));
 
 //Reaction on sending sticker
-bot.on('sticker', ctx => ctx.reply('No time to play, we have money to spend!'));
+bot.on('sticker', ctx => ctx.reply(messages.sticker));
 
 //Reply on message Marcus Aurelius
 bot.hears('Marcus Aurelius', ctx =>
-  ctx.reply('You have power over your mind - not outside events. Realize this, and you will find strength.'));
+  ctx.reply(messages.marcus));
 
 bot.launch();
