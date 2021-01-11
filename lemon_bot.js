@@ -6,10 +6,15 @@ const Extra = require('telegraf/extra');
 const request = require('./request.js');
 const fs = require('fs');
 const token = process.env.LEMON_TELEGRAM_TOKEN;
+const url = process.env.URL;
+const port = process.env.PORT;
 
 const messages = JSON.parse(fs.readFileSync('./messages.json', 'utf-8'));
 
 const bot = new Telegraf(token);
+
+bot.telegram.setWebhook(`${url} bot${token}`);
+bot.startWebhook(`/bot${token}`, null, port);
 
 const credentials = new Map();
 
@@ -97,4 +102,4 @@ bot.on('sticker', ctx => ctx.reply(messages.sticker));
 bot.hears('Marcus Aurelius', ctx =>
   ctx.reply(messages.marcus));
 
-bot.launch();
+//bot.launch();
