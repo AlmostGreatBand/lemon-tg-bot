@@ -13,7 +13,7 @@ const messages = JSON.parse(fs.readFileSync('./messages.json', 'utf-8'));
 
 const bot = new Telegraf(token);
 
-bot.telegram.setWebhook(`${url} bot${token}`);
+bot.telegram.setWebhook(`${url}bot${token}`);
 bot.startWebhook(`/bot${token}`, null, port);
 
 const credentials = new Map();
