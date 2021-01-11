@@ -74,8 +74,6 @@ bot.action('cards', async ctx => {
   const cards = [];
   const creds = credentials.get(ctx.from.id);
   const data = await request('/cards', creds);
-  // .then(data => {
-  //   console.log(data);
   data.forEach(obj => {
     cards.push(obj);
   });
@@ -84,14 +82,11 @@ bot.action('cards', async ctx => {
       .markup(Markup.inlineKeyboard(cardButtonsGenerator(cards))));
   console.log(data);
 });
-// });
 
-bot.action('transactions', ctx => {
+bot.action('transactions', async ctx => {
   const creds = credentials.get(ctx.from.id);
-  request('/transactions', creds)
-    .then(data => {
-      ctx.editMessageText(data); // raw alpha
-    });
+  const data = await request('/transactions', creds);
+  await ctx.editMessageText(data); // raw alpha
 });
 
 //Reaction on command /help
