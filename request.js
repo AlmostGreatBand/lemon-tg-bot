@@ -1,11 +1,11 @@
 'use strict';
 
 const https = require('https');
-const url = 'https://lemon-server-test.herokuapp.com/';
+const url = 'https://lemon-server-test.herokuapp.com';
 
 const getOptions = credentials => {
-  if (credentials === 'Unauthorized') return {};
-  const credentialsBase64 = Buffer.from(credentials).toString('base64');
+  const credentialsString = credentials[0] + ':' + credentials[1];
+  const credentialsBase64 = Buffer.from(credentialsString).toString('base64');
   const options = {
     headers: {
       Authorization: `Basic ${credentialsBase64}`

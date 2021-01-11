@@ -8,9 +8,18 @@ const token = process.env.LEMON_TELEGRAM_TOKEN;
 
 const bot = new Telegraf(token);
 
+const credentials = new Map();
+
+const showCardInfo = card => `Balance: ${card.balance}${card.currency}\nType: ${card.type}`;
+
 const cardHandlerCreator = (cardData, card) => {
   bot.action(cardData, ctx => {
-    ctx.editMessageText(card);
+    ctx.editMessageText(showCardInfo(card),
+      Extra.HTML()
+        .markup(Markup.inlineKeyboard([
+          Markup.callbackButton('Back to cards', 'cards'),
+          Markup.callbackButton('Show transactions', 'transactions')
+        ])));
   });
 };
 
@@ -30,8 +39,8 @@ const cardButtonsGenerator = cardsArr => {
 
 const credentialsParser = text => {
   // /login username password some extra text
-  const arr = text.split(' ');
-  return arr[1] + ':' + arr[2];
+  const arr = text.split(' ').splice(1, 2);
+  return arr;
 };
 
 //Start bot
@@ -40,17 +49,38 @@ bot.start(ctx => {
 });
 
 const regex = new RegExp(/^\/login (.+)/);
-
 bot.hears(regex, ctx => {
+  const userId = ctx.message.from.id;
+  const creds = credentialsParser(ctx.message.text);
+  credentials.set(userId, creds);
+  request('/cards', creds);
+  ctx.reply(`Hello, ${creds[0]}`,
+    Extra.HTML()
+      .markup(Markup.inlineKeyboard([
+        Markup.callbackButton('Show cards', 'cards'),
+      ]))
+  );
+});
+
+bot.action('cards', ctx => {
   const cards = [];
-  request('cards', credentialsParser(ctx.message.text))
+  const creds = credentials.get(ctx.from.id);
+  request('/cards', creds)
     .then(data => {
       data.forEach(obj => {
         cards.push(obj);
       });
-      ctx.reply('Hello <b> BLA </b>. <i>Please, choose a card</i>',
+      ctx.editMessageText(`Hi <b>${creds[0]}</b>. <i>Please, choose a card</i>`,
         Extra.HTML()
           .markup(Markup.inlineKeyboard(cardButtonsGenerator(cards))));
+    });
+});
+
+bot.action('transactions', ctx => {
+  const creds = credentials.get(ctx.from.id);
+  request('/transactions', creds)
+    .then(data => {
+      ctx.editMessageText(data); // raw alpha
     });
 });
 
@@ -58,7 +88,7 @@ bot.hears(regex, ctx => {
 bot.help(ctx => ctx.reply('This bot is in development right now'));
 
 //Reaction on sending sticker
-bot.on('sticker', ctx => ctx.reply('Nice sticker'));
+bot.on('sticker', ctx => ctx.reply('No time to play, we have money to spend!'));
 
 //Reply on message Marcus Aurelius
 bot.hears('Marcus Aurelius', ctx =>
