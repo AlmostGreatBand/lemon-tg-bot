@@ -75,6 +75,7 @@ bot.action('cards', ctx => {
   const creds = credentials.get(ctx.from.id);
   request('/cards', creds)
     .then(data => {
+      console.log(data);
       data.forEach(obj => {
         cards.push(obj);
       });
