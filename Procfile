@@ -1,1 +1,1 @@
-worker: node lemon_bot.js
+web: node lemon_bot.js
