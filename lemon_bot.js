@@ -67,18 +67,22 @@ const throwToMainMenu = ctx => {
 };
 
 const regex = new RegExp(/^\/login (.+)/);
-bot.hears(regex, ctx => {
+bot.hears(regex, async ctx => {
   const userId = ctx.from.id;
   const creds = credentialsParser(ctx.message.text);
   credentials.set(userId, creds);
-  request('/cards', creds).then(() => {
-    ctx.reply(`Hello, ${creds[0]}`,
+  try {
+    await request('/cards', creds);
+    await ctx.reply(`Hello, ${creds[0]}`,
       Extra.HTML()
         .markup(Markup.inlineKeyboard([
           Markup.callbackButton('Show cards', 'cards'),
         ]))
     );
-  }).catch(err => ctx.reply(err));
+  } catch (err) {
+    console.log(err);
+    await ctx.reply(err);
+  }
 });
 
 bot.action('cards', async ctx => {
