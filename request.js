@@ -22,12 +22,19 @@ const request = (path, credentials) => new Promise((resolve, reject) => {
       reject('Incorrect login or password!');
     } else if (res.statusCode === 401) {
       reject('Login and password should be specified!');
+    } else if (res.statusCode !== 200) {
+      reject('Unknown error!');
     }
     res.on('data', chunk => {
       data += chunk;
     });
     res.on('end', () => {
-      resolve(JSON.parse(data));
+      try {
+        resolve(JSON.parse(data));
+      } catch (err) {
+        reject('Inappropriate data');
+      }
+
     });
   });
 });

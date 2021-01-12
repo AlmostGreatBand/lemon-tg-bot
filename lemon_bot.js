@@ -18,7 +18,8 @@ bot.startWebhook(`/bot${token}`, null, port);
 
 const credentials = new Map();
 
-const showCardInfo = card => `Balance: ${card.balance}${card.currency}\nType: ${card.type}`;
+const showCardInfo = card =>
+  `Balance: ${card.balance}${card.currency}\nType: ${card.type}`;
 
 const cardHandlerCreator = (cardData, card) => {
   bot.action(cardData, ctx => {
@@ -56,37 +57,59 @@ bot.start(ctx => {
   ctx.reply(messages.start);
 });
 
-const regex = new RegExp(/^\/login (.+)/);
-bot.hears(regex, ctx => {
-  const userId = ctx.message.from.id;
-  const creds = credentialsParser(ctx.message.text);
-  credentials.set(userId, creds);
-  request('/cards', creds);
-  ctx.reply(`Hello, ${creds[0]}`,
+const throwToMainMenu = ctx => {
+  ctx.editMessageText(messages.error,
     Extra.HTML()
       .markup(Markup.inlineKeyboard([
         Markup.callbackButton('Show cards', 'cards'),
       ]))
   );
+};
+
+const regex = new RegExp(/^\/login (.+)/);
+bot.hears(regex, ctx => {
+  const userId = ctx.from.id;
+  const creds = credentialsParser(ctx.message.text);
+  credentials.set(userId, creds);
+  request('/cards', creds).then(() => {
+    ctx.reply(`Hello, ${creds[0]}`,
+      Extra.HTML()
+        .markup(Markup.inlineKeyboard([
+          Markup.callbackButton('Show cards', 'cards'),
+        ]))
+    );
+  }).catch(err => ctx.reply(err));
 });
 
 bot.action('cards', async ctx => {
   const cards = [];
   const creds = credentials.get(ctx.from.id);
-  const data = await request('/cards', creds);
-  data.forEach(obj => {
-    cards.push(obj);
-  });
-  await ctx.editMessageText(`Hi <b>${creds[0]}</b>. <i>Please, choose a card</i>`,
-    Extra.HTML()
-      .markup(Markup.inlineKeyboard(cardButtonsGenerator(cards))));
-  console.log(data);
+  let data;
+  try {
+    data = await request('/cards', creds);
+    data.forEach(obj => {
+      cards.push(obj);
+    });
+    const reply = `Hi <b>${creds[0]}</b>. <i>Please, choose a card</i>`;
+    await ctx.editMessageText(reply,
+      Extra.HTML()
+        .markup(Markup.inlineKeyboard(cardButtonsGenerator(cards))));
+  } catch (err) {
+    console.log(err);
+    throwToMainMenu(ctx);
+  }
 });
 
 bot.action('transactions', async ctx => {
   const creds = credentials.get(ctx.from.id);
-  const data = await request('/transactions', creds);
-  await ctx.editMessageText(data); // raw alpha
+  let data;
+  try {
+    data = await request('/transactions', creds);
+    await ctx.editMessageText(data); // raw alpha
+  } catch (err) {
+    console.log(err);
+    throwToMainMenu(ctx);
+  }
 });
 
 //Reaction on command /help
@@ -99,4 +122,4 @@ bot.on('sticker', ctx => ctx.reply(messages.sticker));
 bot.hears('Marcus Aurelius', ctx =>
   ctx.reply(messages.marcus));
 
-//bot.launch();
+// bot.launch();
