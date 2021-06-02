@@ -17,6 +17,7 @@ bot.telegram.setWebhook(`${url}bot${token}`);
 bot.startWebhook(`/bot${token}`, null, port);
 
 const credentials = new Map();
+let userCards = [];
 let currentCard;
 
 const showCardInfo = card =>
@@ -73,7 +74,10 @@ const throwToMainMenu = ctx => {
 //Parse transactions for pretty output
 const transactionsParser = data => {
   console.log('Data in transactionsParser:\n' + data);
-  const res = data.filter(transaction => transaction.card_id === currentCard);
+  const cardIndex = currentCard.substring(4);
+  const res = data.filter(transaction => {
+    transaction.card_id === userCards[cardIndex].card_id;
+  });
   console.log('Current card: ' + currentCard);
   console.log('Data after filter:\n' + res);
   let answer = '';
@@ -111,6 +115,7 @@ bot.action('cards', async ctx => {
     data.cards.forEach(obj => {
       cards.push(obj);
     });
+    userCards = cards;
     const reply = `Hi <b>${creds[0]}</b>. <i>Please, choose a card</i>`;
     await ctx.editMessageText(reply,
       Extra.HTML()

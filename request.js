@@ -27,7 +27,6 @@ const request = (path, credentials) => new Promise((resolve, reject) => {
     }
     res.on('data', chunk => {
       data += chunk;
-      console.log(data);
     });
     res.on('end', () => {
       try {
