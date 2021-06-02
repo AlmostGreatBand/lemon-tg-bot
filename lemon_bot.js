@@ -73,13 +73,10 @@ const throwToMainMenu = ctx => {
 
 //Parse transactions for pretty output
 const transactionsParser = data => {
-  console.log('Data in transactionsParser:\n' + data);
   const cardIndex = currentCard.substring(4);
-  const res = data.filter(transaction => {
-    transaction.card_id === userCards[cardIndex].card_id;
-  });
-  console.log('Current card: ' + currentCard);
-  console.log('Data after filter:\n' + res);
+  const res = data.filter(transaction => (
+    transaction.card_id === userCards[cardIndex].card_id
+  ));
   let answer = '';
   res.forEach(it => {
     answer += `Amount: ${it.amount}, Date: ${it.date}, Type: ${it.type}\n`;
