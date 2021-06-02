@@ -91,7 +91,7 @@ bot.action('cards', async ctx => {
   let data;
   try {
     data = await request('/cards', creds);
-    data.forEach(obj => {
+    data.cards.forEach(obj => {
       cards.push(obj);
     });
     const reply = `Hi <b>${creds[0]}</b>. <i>Please, choose a card</i>`;
