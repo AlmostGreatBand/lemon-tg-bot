@@ -17,12 +17,14 @@ bot.telegram.setWebhook(`${url}bot${token}`);
 bot.startWebhook(`/bot${token}`, null, port);
 
 const credentials = new Map();
+let currentCard;
 
 const showCardInfo = card =>
   `Balance: ${card.balance}${card.currency}\nType: ${card.type}`;
 
 const cardHandlerCreator = (cardData, card) => {
   bot.action(cardData, ctx => {
+    cardData = currentCard;
     ctx.editMessageText(showCardInfo(card),
       Extra.HTML()
         .markup(Markup.inlineKeyboard([
@@ -66,6 +68,15 @@ const throwToMainMenu = ctx => {
   );
 };
 
+const transactionsParser = data => {
+  const res = data.filter(transaction => transaction.card_id === currentCard);
+  let answer = '';
+  res.forEach(it => {
+    answer += `Amount: ${it.amount}, Date: ${it.date}, Type: ${it.type}\n`;
+  });
+  return answer;
+};
+
 const regex = new RegExp(/^\/login (.+)/);
 bot.hears(regex, async ctx => {
   const userId = ctx.from.id;
@@ -105,11 +116,15 @@ bot.action('cards', async ctx => {
 });
 
 bot.action('transactions', async ctx => {
+  const transactionsFounded = [];
   const creds = credentials.get(ctx.from.id);
   let data;
   try {
     data = await request('/transactions', creds);
-    await ctx.editMessageText(data); // raw alpha
+    data.transactions.forEach(obj => {
+      transactionsFounded.push(obj);
+    });
+    await ctx.editMessageText(transactionsParser(transactionsFounded));
   } catch (err) {
     console.log(err);
     throwToMainMenu(ctx);
