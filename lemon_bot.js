@@ -34,6 +34,7 @@ const cardHandlerCreator = (cardData, card) => {
   });
 };
 
+//Generate buttons with card numbers
 const cardButtonsGenerator = cardsArr => {
   const result = [];
 
@@ -48,6 +49,7 @@ const cardButtonsGenerator = cardsArr => {
   return result;
 };
 
+//Parse credentials for request
 const credentialsParser = text => {
   // /login username password some extra text
   const arr = text.split(' ').splice(1, 2);
@@ -68,6 +70,7 @@ const throwToMainMenu = ctx => {
   );
 };
 
+//Parse transactions for pretty output
 const transactionsParser = data => {
   const res = data.filter(transaction => transaction.card_id === currentCard);
   let answer = '';
@@ -141,4 +144,3 @@ bot.on('sticker', ctx => ctx.reply(messages.sticker));
 bot.hears('Marcus Aurelius', ctx =>
   ctx.reply(messages.marcus));
 
-// bot.launch();
