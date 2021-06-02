@@ -40,7 +40,7 @@ const cardButtonsGenerator = cardsArr => {
 
   cardsArr.forEach((card, index) => {
     const cardData = `card${index}`;
-    const cardButtonText = `***${card.num}`;
+    const cardButtonText = `***${card.card_num}`;
     const cardButton = Markup.callbackButton(cardButtonText, cardData);
     result.push(cardButton);
 
@@ -124,6 +124,7 @@ bot.action('transactions', async ctx => {
   let data;
   try {
     data = await request('/transactions', creds);
+    console.log(data);
     data.transactions.forEach(obj => {
       transactionsFounded.push(obj);
     });
