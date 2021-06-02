@@ -133,7 +133,11 @@ bot.action('transactions', async ctx => {
     data.transactions.forEach(obj => {
       transactionsFounded.push(obj);
     });
-    await ctx.editMessageText(transactionsParser(transactionsFounded));
+    await ctx.editMessageText(transactionsParser(transactionsFounded),
+      Extra.HTML()
+        .markup(Markup.inlineKeyboard([
+          Markup.callbackButton('Show cards', 'cards'),
+        ])));
   } catch (err) {
     console.log(err);
     throwToMainMenu(ctx);
