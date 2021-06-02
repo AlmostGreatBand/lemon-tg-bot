@@ -24,7 +24,7 @@ const showCardInfo = card =>
 
 const cardHandlerCreator = (cardData, card) => {
   bot.action(cardData, ctx => {
-    cardData = currentCard;
+    currentCard = cardData;
     ctx.editMessageText(showCardInfo(card),
       Extra.HTML()
         .markup(Markup.inlineKeyboard([
@@ -72,7 +72,10 @@ const throwToMainMenu = ctx => {
 
 //Parse transactions for pretty output
 const transactionsParser = data => {
+  console.log('Data in transactionsParser:\n' + data);
   const res = data.filter(transaction => transaction.card_id === currentCard);
+  console.log('Current card: ' + currentCard);
+  console.log('Data after filter:\n' + res);
   let answer = '';
   res.forEach(it => {
     answer += `Amount: ${it.amount}, Date: ${it.date}, Type: ${it.type}\n`;
