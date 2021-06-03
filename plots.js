@@ -20,13 +20,13 @@ const transParser = trans => {
   return [{ x, y, type: 'line' }];
 };
 
-const createPlot = trans => {
+const createPlot = async trans => {
   const data = transParser(trans);
   const layout = { fileopt: 'overwrite', filename: 'last-month-transactions' };
-  plotly.plot(data, layout, (err, msg) => {
+  await plotly.plot(data, layout, async (err, msg) => {
     try {
       console.log(msg.url);
-      return msg.url;
+      await msg.url;
     } catch (err) {
       console.log(err);
       return 'Error while creating plot';
@@ -35,3 +35,6 @@ const createPlot = trans => {
 };
 
 module.exports = createPlot;
+
+let transa = [{"transaction_id":2,"card_id":504,"amount":69000,"type":"Salary","date":"2020-10-13T15:37:01.325Z"},{"transaction_id":3,"card_id":657,"amount":-1236,"type":"Rent","date":"2020-10-18T14:10:23.753Z"}];
+console.log(createPlot(transa));

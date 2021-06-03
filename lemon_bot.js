@@ -159,7 +159,8 @@ bot.action('plot', async ctx => {
       transactionsFounded.push(obj);
     });
     const plotUrl = createPlot(transactionsFounded);
-    await ctx.reply(`Your spending for last month:\n${plotUrl}`,
+    console.log(plotUrl);
+    await ctx.reply(`Your spending for last month:\n${plotUrl.toString()}`,
       Extra.HTML()
         .markup(Markup.inlineKeyboard([
           Markup.callbackButton('Show cards', 'cards'),
