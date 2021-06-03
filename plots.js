@@ -20,18 +20,19 @@ const transParser = trans => {
   return [{ x, y, type: 'line' }];
 };
 
-const createPlot = async trans => {
+const createPlot = trans => {
   const data = transParser(trans);
   const layout = { fileopt: 'overwrite', filename: 'last-month-transactions' };
-  await plotly.plot(data, layout, async (err, msg) => {
-    try {
-      console.log(msg.url);
-      await msg.url;
-    } catch (err) {
-      console.log(err);
-      return 'Error while creating plot';
-    }
-  });
+  return new Promise(((resolve, reject) => {
+    plotly.plot(data, layout, (err, msg) => {
+      try {
+        resolve(msg.url);
+      } catch (err) {
+        console.log(err);
+        reject('Error while creating plot');
+      }
+    });
+  }));
 };
 
 module.exports = createPlot;
