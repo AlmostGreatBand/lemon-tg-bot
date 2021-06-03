@@ -68,7 +68,7 @@ const throwToMainMenu = ctx => {
     Extra.HTML()
       .markup(Markup.inlineKeyboard([
         Markup.callbackButton('Show cards', 'cards'),
-        Markup.callbackButton('Show cards', 'cards'),
+        Markup.callbackButton('Show plot', 'plot'),
       ]))
   );
 };
@@ -160,11 +160,10 @@ bot.action('plot', async ctx => {
     });
     const plotUrl = await createPlot(transactionsFounded);
     console.log(plotUrl);
-    await ctx.reply(`Your spending for last month here:`,
+    await ctx.reply(`Your spending for last month:\n${plotUrl.toString()}`,
       Extra.HTML()
         .markup(Markup.inlineKeyboard([
-          Markup.button.url('PLOT', plotUrl),
-          Markup.callbackButton('Back', 'cards'),
+          Markup.callbackButton('Show cards', 'cards'),
         ])));
   } catch (err) {
     console.log(err);
