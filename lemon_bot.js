@@ -163,7 +163,7 @@ bot.action('plot', async ctx => {
     await ctx.reply(`Your spending for last month here:`,
       Extra.HTML()
         .markup(Markup.inlineKeyboard([
-          Markup.callbackButton.url('PLOT', plotUrl),
+          Markup.button.url('PLOT', plotUrl),
           Markup.callbackButton('Back', 'cards'),
         ])));
   } catch (err) {
