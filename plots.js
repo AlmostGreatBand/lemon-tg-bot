@@ -35,6 +35,3 @@ const createPlot = async trans => {
 };
 
 module.exports = createPlot;
-
-let transa = [{"transaction_id":2,"card_id":504,"amount":69000,"type":"Salary","date":"2020-10-13T15:37:01.325Z"},{"transaction_id":3,"card_id":657,"amount":-1236,"type":"Rent","date":"2020-10-18T14:10:23.753Z"}];
-console.log(createPlot(transa));

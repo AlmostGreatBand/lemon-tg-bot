@@ -158,7 +158,7 @@ bot.action('plot', async ctx => {
     data.transactions.forEach(obj => {
       transactionsFounded.push(obj);
     });
-    const plotUrl = createPlot(transactionsFounded);
+    const plotUrl = await createPlot(transactionsFounded);
     console.log(plotUrl);
     await ctx.reply(`Your spending for last month:\n${plotUrl.toString()}`,
       Extra.HTML()
