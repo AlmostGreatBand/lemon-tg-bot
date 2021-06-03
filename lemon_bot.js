@@ -4,6 +4,7 @@ const Telegraf = require('telegraf');
 const Markup = require('telegraf/markup');
 const Extra = require('telegraf/extra');
 const request = require('./request.js');
+const createPlot = require('./plots.js');
 const fs = require('fs');
 const token = process.env.LEMON_TELEGRAM_TOKEN;
 const url = process.env.URL;
@@ -67,6 +68,7 @@ const throwToMainMenu = ctx => {
     Extra.HTML()
       .markup(Markup.inlineKeyboard([
         Markup.callbackButton('Show cards', 'cards'),
+        Markup.callbackButton('Show cards', 'cards'),
       ]))
   );
 };
@@ -95,6 +97,7 @@ bot.hears(regex, async ctx => {
       Extra.HTML()
         .markup(Markup.inlineKeyboard([
           Markup.callbackButton('Show cards', 'cards'),
+          Markup.callbackButton('Show plot', 'plot'),
         ]))
     );
   } catch (err) {
@@ -134,6 +137,29 @@ bot.action('transactions', async ctx => {
       transactionsFounded.push(obj);
     });
     await ctx.editMessageText(transactionsParser(transactionsFounded),
+      Extra.HTML()
+        .markup(Markup.inlineKeyboard([
+          Markup.callbackButton('Show cards', 'cards'),
+          Markup.callbackButton('Show plot', 'plot'),
+        ])));
+  } catch (err) {
+    console.log(err);
+    throwToMainMenu(ctx);
+  }
+});
+
+bot.action('plot', async ctx => {
+  const transactionsFounded = [];
+  const creds = credentials.get(ctx.from.id);
+  let data;
+  try {
+    data = await request('/transactions', creds);
+    console.log(data);
+    data.transactions.forEach(obj => {
+      transactionsFounded.push(obj);
+    });
+    const plotUrl = createPlot(transactionsFounded);
+    await ctx.reply(`Your spending for last month:\n${plotUrl}`,
       Extra.HTML()
         .markup(Markup.inlineKeyboard([
           Markup.callbackButton('Show cards', 'cards'),
