@@ -1,0 +1,11 @@
+{
+  "name": "lemon-tg-bot",
+  "version": "1.0.0",
+  "dependencies": {
+    "koa": "^2.13.1",
+    "koa-router": "^10.0.0",
+    "plotly": "^1.0.6",
+    "telegraf": "^3.38.0",
+    "telegraf-inline-menu": "^5.3.0"
+  }
+}
